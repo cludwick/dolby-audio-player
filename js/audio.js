@@ -2,7 +2,7 @@ let params = new URLSearchParams(document.location.search.substring(1));
 // let id = params.get('streamId');
 // let split = id.split('/');
 let accountId = 'zc26Tw'; // hard-coded accountID - This ID should never change
-let streamName = 'l9sst450'; // hard-coded Stream Name - This ID is for an individual stream
+let streamName = 'audio_390'; // hard-coded Stream Name - This ID is for an individual stream
 let subToken = params.get('token'); // SubscribingToken - placed here for ease of testing, should come from secure location. (php/nodejs)
 console.log('Millicast Viewer Stream: ', streamName);
 
