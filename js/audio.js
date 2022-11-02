@@ -1,8 +1,6 @@
 let params = new URLSearchParams(document.location.search.substring(1));
-// let id = params.get('streamId');
-// let split = id.split('/');
-let accountId = 'zc26Tw'; // hard-coded accountID - This ID should never change
-let streamName = 'audio_390'; // hard-coded Stream Name - This ID is for an individual stream
+let accountId = 'zc26Tw';
+let streamName = 'audio_373';
 let subToken = params.get('token'); // SubscribingToken - placed here for ease of testing, should come from secure location. (php/nodejs)
 console.log('Millicast Viewer Stream: ', streamName);
 
@@ -41,14 +39,16 @@ function connect() {
   showMsg('Connecting...');
 
   console.log('connecting to: ', url);
-
+  //create Peer connection object
   let conf = {
     iceServers: iceServers,
     // sdpSemantics : "unified-plan",
     rtcpMuxPolicy: 'require',
     bundlePolicy: 'max-bundle',
   };
+  // console.log('config: ', conf);
   pc = new RTCPeerConnection(conf);
+  //Listen for track once it starts playing.
   pc.ontrack = function (event) {
     console.debug('pc::onAddStream', event);
     //Play it
@@ -74,10 +74,12 @@ function connect() {
 
         break;
       case 'disconnected':
+      // stopUserCount();
       case 'failed':
         break;
       case 'closed':
         console.log('WS onclose ', reconn);
+        // Connection closed, if reconnecting? reset and call again.
         if (reconn) {
           stopUserCount();
           pc = null;
@@ -93,7 +95,9 @@ function connect() {
   //connect with Websockets for handshake to media server.
   ws = new WebSocket(url + '?token=' + jwt);
   ws.onopen = function () {
+    //Connect to our media server via WebRTC
     console.log('ws::onopen');
+    //create a WebRTC offer to send to the media server
     let offer = pc
       .createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true })
       .then((desc) => {
@@ -106,6 +110,7 @@ function connect() {
         } catch (e) {
           console.log('create offer stereo', offer);
         }
+
         //set local description and send offer to media server via ws.
         pc.setLocalDescription(desc)
           .then(() => {
@@ -208,12 +213,11 @@ function connect() {
     }
   });
 }
+
 function doReconnect() {
   reconn = true;
   url = null;
   ws.close();
-  //pc.close();
-  // setTimeout(connect(),700);
 }
 
 // Gets ice servers.
